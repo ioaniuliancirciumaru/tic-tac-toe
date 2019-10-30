@@ -1,67 +1,101 @@
-def tic_tac_toe():
-    board = [None] + list(range(1, 10))
-    WIN_COMBINATIONS = [
-       (1, 2, 3),
-       (4, 5, 6),
-       (7, 8, 9),
-       (1, 4, 7),
-       (2, 5, 8),
-       (3, 6, 9),
-       (1, 5, 9),
-       (3, 5, 7),
-    ]
-
-#Function to draw the board
-    def draw():
-        print()
-        print(board[1], board[2], board[3])
-        print(board[4], board[5], board[6])
-        print(board[7], board[8], board[9])
-        print()
+import random
 
 
-#Player input to mark the board through a variable, which must be between 1-9
-#if the value is not a number between 1-9 or it's a letter,
-#the terminal prints a message
+def drawBoard(board):
+      # This function prints out the board that it was passed.
+      # "board" is a list of 10 strings representing the board (ignore index 0)
+    print('   |   |')
+    print(' ' + board[7] + ' | ' + board[8] + ' | ' + board[9])
+    print('   |   |')
+    print('-----------')
+    print('   |   |')
+    print(' ' + board[4] + ' | ' + board[5] + ' | ' + board[6])
+    print('   |   |')
+    print('-----------')
+    print('   |   |')
+    print(' ' + board[1] + ' | ' + board[2] + ' | ' + board[3])
+    print('   |   |')
 
 
-    def choose_number():
-        while True:
-            try:
-                a = int(input())
-                if a in board:
-                    return a
-                else:
-                    print("\nInvalid move. Try again")
-            except ValueError:
-               print("\nThat's not a number. Try again")
+def inputPlayerLetter():
+     # Lets the player type which letter they want to be.
+     # Returns a list with the player’s letter as the first item, and the computer's letter as the second.
+    letter = ''
+    while not (letter == 'X' or letter == 'O'):
+        print('Do you want to be X or O?')
+        letter = input().upper()
+     # the first element in the list is the player’s letter, the second is the computer's letter.
+    if letter == 'X':
+        return ['X', 'O']
+    else:
+        return ['O', 'X']
 
-#Accessing the winning combination through 3 variables
-#If 3 of the variables are on the board, the program prints a message
 
-    def is_game_over():
-        for a, b, c in WIN_COMBINATIONS:
-            if board[a] == board[b] == board[c]:
-                print("Player {0} wins!\n".format(board[a]))
-                print("Congratulations!\n")
-                return True
-        if 9 == sum((pos == 'X' or pos == 'O') for pos in board):
-            print("The game ends in a tie\n")
-            return True
+def whoGoesFirst():
+         # Randomly choose the player who goes first.
+    if random.randint(0, 1) == 0:
+        return 'computer'
+    else:
+        return 'player'
 
-#If the players are in all of the 9 boxes, it's a draw
-    for player in 'XO' * 9:
-        draw()
-        if is_game_over():
-            break
-        print("Player {0} pick your move".format(player))
-        board[choose_number()] = player
-        print()
 
-while True:
-    tic_tac_toe()
-    if input("Play again (y/n)\n") != "y":
-        print("Thanks for playing!")
-        break
-    
-print("hello")
+def playAgain():
+    # This function returns True if the player wants to play again, otherwise it returns False.
+    print('Do you want to play again? (yes or no)')
+    return input().lower().startswith('y')
+
+
+def makeMove(board, letter, move):
+    board[move] = letter
+
+
+def isWinner(bo, le):
+    # Given a board and a player’s letter, this function returns True if that player has won.
+    # We use bo instead of board and le instead of letter so we don’t have to type as much.
+    return ((bo[7] == le and bo[8] == le and bo[9] == le) or  # across the top
+            (bo[4] == le and bo[5] == le and bo[6] == le) or  # across the middle
+            (bo[1] == le and bo[2] == le and bo[3] == le) or  # across the bottom
+            (bo[7] == le and bo[4] == le and bo[1] == le) or  # down the left side
+            (bo[8] == le and bo[5] == le and bo[2] == le) or  # down the middle
+            # down the right side
+            (bo[9] == le and bo[6] == le and bo[3] == le) or
+            (bo[7] == le and bo[5] == le and bo[3] == le) or  # diagonal
+            (bo[9] == le and bo[5] == le and bo[1] == le))  # diagonal
+
+
+def getBoardCopy(board):
+      # Make a duplicate of the board list and return it the duplicate.
+    dupeBoard = []
+
+    for i in board:
+        dupeBoard.append(i)
+
+    return dupeBoard
+
+
+def isSpaceFree(board, move):
+     # Return true if the passed move is free on the passed board.
+    return board[move] == ' '
+
+
+def getPlayerMove(board):
+    # Let the player type in their move.
+    move = ' '
+    while move not in '1 2 3 4 5 6 7 8 9'.split() or not isSpaceFree(board, int(move)):
+        print('What is your next move? (1-9)')
+        move = input()
+    return int(move)
+
+
+def chooseRandomMoveFromList(board, movesList):
+      # Returns a valid move from the passed list on the passed board.
+      # Returns None if there is no valid move.
+    possibleMoves = []
+    for i in movesList:
+        if isSpaceFree(board, i):
+            possibleMoves.append(i)
+
+    if len(possibleMoves) != 0:
+        return random.choice(possibleMoves)
+    else:
+        return None
